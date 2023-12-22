@@ -1,0 +1,9 @@
+opencv-python
+tensorboardX
+torch
+numpy 
+tqdm
+rich
+pillow==10.0.1
+lpips
+git+https://github.com/openai/CLIP.git

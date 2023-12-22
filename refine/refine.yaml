@@ -1,0 +1,107 @@
+name: "refine"
+tag: "${rmspace:${system.prompt_processor.prompt},_}"
+exp_root_dir: "outputs"
+seed: 0
+
+data_type: "random-camera-datamodule"
+data:
+  batch_size: 1
+  width: 64
+  height: 64
+  camera_distance_range: [2.5, 3.0]
+  fovy_range: [40, 70]
+  elevation_range: [-10, 60]
+  light_sample_strategy: "dreamfusion"
+  eval_camera_distance: 3.5
+  eval_fovy_deg: 70.
+  eval_elevation_deg: 10
+
+system_type: "dreamfusion-system"
+system:
+  geometry_type: "implicit-volume"
+  geometry:
+    radius: 1.0
+    normal_type: finite_difference
+    finite_difference_normal_eps: 0.01
+
+    density_bias: 0.0
+    density_activation: trunc_exp
+
+    pos_encoding_config:
+      otype: Volume
+      channel: 32
+      resolution: 64
+
+    mlp_network_config:
+      otype: VanillaMLP
+      activation: ReLU
+      output_activation: none
+      n_neurons: 256
+      n_hidden_layers: 4
+      bias: True
+
+  material_type: "diffuse-with-point-light-material"
+  material:
+    ambient_only_steps: 0
+    albedo_activation: scale_-11_01
+
+  background_type: "neural-environment-map-background"
+  background:
+    color_activation: scale_-11_01
+
+  renderer_type: "nerf-volume-renderer"
+  renderer:
+    radius: ${system.geometry.radius}
+    num_samples_per_ray: 512
+
+  prompt_processor_type: "deep-floyd-prompt-processor"
+  prompt_processor:
+    pretrained_model_name_or_path: "DeepFloyd/IF-I-XL-v1.0"
+    prompt: ???
+    no_view_dependent_prompt: true
+
+  guidance_type: "deep-floyd-guidance"
+  guidance:
+    pretrained_model_name_or_path: "DeepFloyd/IF-I-XL-v1.0"
+    guidance_scale: 20.
+    weighting_strategy: sds
+    min_step_percent: 0.02
+    max_step_percent: 0.98
+
+  loggers:
+    wandb:
+      enable: false
+      project: 'threestudio'
+      name: None
+
+  loss:
+    lambda_sds: 1.
+    lambda_orient: 1.
+    lambda_sparsity: 0.
+    lambda_opaque: 0.0
+  optimizer:
+    name: Adam
+    args:
+      lr: 1.e-2
+      betas: [0.9, 0.99]
+      eps: 1.e-15
+    params:
+      geometry.encoding:
+        lr: 1.0e-2
+      geometry.density_network:
+        lr: 1.0e-6
+      geometry.feature_network:
+        lr: 1.0e-3
+
+trainer:
+  max_steps: 1000
+  log_every_n_steps: 1
+  num_sanity_val_steps: 0
+  val_check_interval: 100
+  enable_progress_bar: true
+  precision: 16-mixed
+
+checkpoint:
+  save_last: true
+  save_top_k: -1
+  every_n_train_steps: ${trainer.max_steps}
