@@ -1,3 +1,10 @@
+---
+license: mit
+datasets:
+- allenai/objaverse
+language:
+- en
+---
 # VolumeDiffusion
 
 ## Overview
@@ -10,7 +17,7 @@ VolumeDiffusion is a **fast** and **scalable** text-to-3D generation method that
 
 ### Result
 
-https://github.com/tzco/VolumeDiffusion/assets/97946330/71d62f48-c950-433d-94f6-a56bc5ae593f
+<video controls autoplay src="https://cdn-uploads.huggingface.co/production/uploads/6372f265112fb535baf254c4/SEpoJQjiE7JG_wCZB4PB0.mp4"></video>
 
 <details open>
   <summary>Generations 1 (Figure 5 in paper)</summary>
