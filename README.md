@@ -4,6 +4,8 @@ datasets:
 - allenai/objaverse
 language:
 - en
+tags:
+- arxiv:2312.11459
 ---
 # VolumeDiffusion
 
